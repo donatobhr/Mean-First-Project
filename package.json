@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "mean proyect",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "app": "node server",
+    "start": "concurrently \"npm run tsc:w\" \"npm run app\" ",
+    "postinstall": "typings install"
   },
   "author": "Donato Bencosme",
   "license": "MIT",
