@@ -1,4 +1,5 @@
 const config = require('./config');
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const compress = require('compression');
@@ -36,10 +37,11 @@ module.exports = function(){
     app.use(passport.initialize());
     app.use(passport.session());
     
-    require('../app/routes/index.server.routes.js')(app);
+
+    app.use('/',express.static(path.resolve('./public')));
+    app.use('/lib', express.static(path.resolve('./node_modules')));
+
     require('../app/routes/user.server.routes.js')(app);
-    app.use(express.static('./public'));
-
-
+    require('../app/routes/index.server.routes.js')(app);
     return app;
 }
