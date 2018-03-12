@@ -94,6 +94,26 @@ exports.renderSignin = function(req,res,next){
     }
 }
 
+exports.signin = function(req,res,next){
+    passport.authenticate('local',function(err,user,info){
+        if(err || !user){
+            res.status(400).send(info);
+        }else{
+            //remove sensitive data before login
+            user.password = undefined;
+            user.salt = undefined;
+
+            req.login(user, function(err){
+                if(err){
+                    res.status(400).send(err);
+                }else{
+                    res.json(user);
+                }
+            })
+        }
+    })(req,res,next);
+}
+
 exports.renderSignup = function(req,res,next){
     if(!req.user){
         res.render('signup',{
@@ -105,26 +125,30 @@ exports.renderSignup = function(req,res,next){
     }
 }
 
-exports.signup = function(req,res,next){
-    if(!req.user){
-        const user = new User(req.body);
-        user.provider = 'local';
+exports.signup = function (req, res, next) {
+    const user = new User(req.body);
+    user.provider = 'local';
 
-        user.save((err)=>{
-            if(err){
-                const messages = getErrorMessage(err);
-                req.flash('error',messages);
-                return res.redirect('/signup');
-            }
-            req.login(user,(err)=>{
-                if(err) return next(err);
-                return res.redirect('/');
+    user.save((err) => {
+        if (err) {
+            return res.status(400).send({
+                message: getErrorMessage(err)
             });
-        });
-    }else{
-        return res.redirect('/');
-    }
+        } else {
+            //Remove sensitive data before login
+            user.password = undefined;
+            user.salt = undefined;
+            req.login(user, (err) => {
+                if (err) {
+                    res.status(400).send(err);
+                } else {
+                    res.json(user);
+                }
+            });
+        }
+    });
 }
+
 
 exports.signout = function(req,res){
     req.logout();
@@ -144,10 +168,15 @@ exports.saveOAuthUserProfile = function(req,profile,done){
                 const possibleUsername = profile.username || ((profile.email) ? profile.email.split('@')[0] : '');
                 User.findUniqueUsername(possibleUsername,null,
                 (availableUsername)=>{
+                    profile.username = availableUsername;
                     const newUser = new User(profile);
-                    newUser.username = availableUsername;
                     newUser.save((err)=>{
-                        return done(err, newUser);
+                        if(err){
+                            const message = _this.getErrorMessage(err);
+                            req.flash('error',message);
+                            return res.redirect('/signup');
+                        }
+                        return done(err,user);
                     });
                 });
             }else{
@@ -156,3 +185,14 @@ exports.saveOAuthUserProfile = function(req,profile,done){
         }
     });
 };
+
+
+exports.requiresLogin = function(req,res,next){
+    if(!req.isAuthenticated()){
+        return res.status(401).send({
+            message: 'User is not logged in'
+        });
+    }
+
+    next();
+}

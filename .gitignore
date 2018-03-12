@@ -1,2 +1,4 @@
 *.pdf
+public/**/*.js
+public/**/*.js.map
 node_modules/
