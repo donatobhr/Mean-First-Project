@@ -23,6 +23,8 @@
     "compression": "^1.7.1",
     "connect": "^3.6.5",
     "connect-flash": "^0.1.1",
+    "connect-mongo": "^2.0.1",
+    "cookie-parser": "^1.4.3",
     "core-js": "^2.5.3",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
@@ -37,6 +39,7 @@
     "passport-twitter": "^1.0.4",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^5.5.6",
+    "socket.io": "^2.0.4",
     "systemjs": "^0.21.0",
     "zone.js": "^0.8.20"
   },
