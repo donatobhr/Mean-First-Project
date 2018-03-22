@@ -31,7 +31,7 @@ module.exports = function(db){
     app.use(methodOverride());
 
     const mongoStore = new MongoStore({
-        mongooseConnection: db.connection
+        url: config.db
     });
 
     app.use(session({
